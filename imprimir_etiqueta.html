@@ -695,25 +695,20 @@
 
         try {
             // Enviar ZPL a la impresora via Browser Print write endpoint
-            const deviceUid = selectedDevice.uid || '';
-            const deviceName = selectedDevice.name || '';
+            // Se envía el objeto completo del dispositivo tal cual lo devolvió el API
+            const payload = {
+                device: selectedDevice,
+                data: fullZpl,
+            };
+
+            debugLog('Payload: ' + JSON.stringify(payload).substring(0, 300) + '...');
 
             const writeRes = await fetch(BP_BASE + '/write', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    device: {
-                        name: deviceName,
-                        uid: deviceUid,
-                        connection: selectedDevice.connection || 'usb',
-                        deviceType: 'printer',
-                        provider: selectedDevice.provider || '',
-                        manufacturer: selectedDevice.manufacturer || '',
-                    },
-                    data: fullZpl,
-                }),
+                body: JSON.stringify(payload),
             });
 
             if (writeRes.ok) {
